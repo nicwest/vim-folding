@@ -1,0 +1,97 @@
+setlocal foldmethod=expr
+setlocal foldexpr=GetPythonFold(v:lnum)
+setlocal foldtext=GetPythonFoldText()
+
+let s:class_def = '\s*\(class\|def\|async def\) \(.\+\)(.*'
+let s:decorator = '\s*@.\+'
+let s:blank = '^\s*$'
+let s:import = '(import\|from)'
+let s:docstring = '\(' . "'''" . '\|"""\)\(.*\)$'
+let s:docstring_single = '\(' . "'''" . '\|"""\)\(.*\)\(\1\)$'
+
+function! s:number_of_spaces(line) abort
+  return max([match(a:line, '\S'), 0])
+endfunction
+
+function! s:is_start_of_fold(line) abort
+  return a:line  =~ s:class_def || a:line =~ s:decorator
+endfunction
+
+function! GetPythonFold(lnum) abort
+
+  if line(a:lnum) == line('$')
+    echom 'end' . line('$')
+    return '<1'
+  endif
+
+  let l:line = getline(a:lnum)
+  let l:spaces = s:number_of_spaces(l:line)
+  let l:level = (l:spaces / &shiftwidth) + 1
+
+  if l:line =~ '^' . s:import
+    return 0
+  endif
+
+  let l:previous = getline(a:lnum-1)
+  let l:previous_spaces = s:number_of_spaces(l:previous)
+  let l:previous_level = (l:previous_spaces / &shiftwidth) + 1
+
+  if s:is_start_of_fold(l:line)
+    if s:is_start_of_fold(l:previous) && l:previous_spaces == l:spaces
+      return l:level
+    endif
+    return '>' . l:level
+  endif
+
+  let l:next = getline(a:lnum+1)
+  let l:next_spaces = s:number_of_spaces(l:next)
+  if l:line =~ s:blank && s:is_start_of_fold(l:next)
+    return '<' . ((l:next_spaces / &shiftwidth) + 1)
+  endif
+
+  return -1
+endfunction
+
+function! s:get_python_fold_text(start, end) abort
+  let l:lines = getline(a:start, a:end)
+  let l:looking_for_comments = 0
+  let l:has_decorators = ''
+  let l:name = 'UNKNOWN'
+  let l:type = '!!!'
+  let l:comment = ''
+  let l:indent = ''
+  for l:line in l:lines
+    if l:line =~ s:decorator
+      let l:has_decorators = '@'
+    endif
+    let l:m = matchlist(l:line, s:class_def)
+    if len(l:m)
+      let l:looking_for_comments = 1
+      let l:type = l:m[1]
+      let l:name = l:m[2]
+      let l:indent = substitute(matchstr(l:line, '^\s*'), '\s', '-', 'g')
+    endif
+
+    if l:looking_for_comments
+      let l:m = matchlist(l:line, s:docstring_single)
+      if len(l:m)
+        let l:comment = l:m[2] 
+        break
+      endif
+      let l:m = matchlist(l:line, s:docstring)
+      if len(l:m)
+        let l:comment = l:m[2] 
+        break
+      endif
+    endif
+  endfor
+  if len(l:comment)
+    return l:indent . l:type . ' '. l:has_decorators  . l:name . ': ' . l:comment
+  else                                               
+    return l:indent . l:type . ' '. l:has_decorators  . l:name
+  endif
+endfunction
+
+function! GetPythonFoldText() abort
+  return s:get_python_fold_text(v:foldstart, v:foldend)
+endfunction
