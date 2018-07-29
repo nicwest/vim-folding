@@ -4,11 +4,11 @@ let s:scope = themis#helper('scope')
 let s:s = s:scope.funcs('ftplugin/python.vim')
 
 function! s:get_fold_levels() abort
-  return map(range(1, line('$')-1), {k, v -> foldlevel(v)})
+  return map(range(1, line('$')-1), 'foldlevel(v:val)')
 endfunction
 
 function! s:get_foldexpr_output() abort
-  return map(range(1, line('$')-1), {k, v -> GetPythonFold(v)})
+  return map(range(1, line('$')-1), 'GetPythonFold(v:val)')
 endfunction
 
 function! s:suite.before_each() abort
