@@ -59,10 +59,12 @@ function! GetPythonFold(lnum) abort
       return l:level
     endif
 
-    let l:previous_class_def_line = s:get_previous_class_def(a:lnum, l:spaces)
-    let l:previous_class_def = getline(l:previous_class_def_line)
-    if l:spaces > 0 && l:previous_class_def =~? s:def
-      return -1
+    if l:spaces > 0
+      let l:previous_class_def_line = s:get_previous_class_def(a:lnum, l:spaces)
+      let l:previous_class_def = getline(l:previous_class_def_line)
+      if l:previous_class_def =~? s:def
+        return -1
+      endif
     endif
     return '>' . l:level
   endif
