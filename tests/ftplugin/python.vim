@@ -83,6 +83,28 @@ function! s:suite.functions_are_folded() abort
   call s:assert.equal(s:get_fold_levels(), [1, 1, 1, 1, 1, 1])
 endfunction
 
+function! s:suite.decorated_functions_are_folded() abort
+  call append(0, [
+    \ '@something_something',
+    \ 'def its_hammer_time():',
+    \ '    print("hammer time!")'
+    \ ])
+  norm! zX 
+  call s:assert.equal(s:get_fold_levels(), [1, 1, 1])
+endfunction
+
+function! s:suite.functions_decorated_multiple_times_are_folded() abort
+  call append(0, [
+    \ '@something_something',
+    \ '@route("/hammer")',
+    \ '@giggidy',
+    \ 'def its_hammer_time():',
+    \ '    print("hammer time!")'
+    \ ])
+  norm! zX 
+  call s:assert.equal(s:get_fold_levels(), [1, 1, 1, 1, 1])
+endfunction
+
 function! s:suite.async_functions_are_folded() abort
   call append(0, [
     \ 'async def its_hammer_time():',
@@ -206,7 +228,7 @@ function! s:suite.foldtext_methods() abort
   call s:assert.equals(s:s.get_python_fold_text(1, 6), '----def its_hammer_time: something something')
 endfunction
 
-function! s:suite.foldtext_claases() abort
+function! s:suite.foldtext_classes() abort
   call append(0, [
     \ 'class Ass(object):',
     \ '    """I like big butts..."""',
@@ -219,6 +241,18 @@ function! s:suite.foldtext_claases() abort
   call s:assert.equals(s:s.get_python_fold_text(1, 6), 'class Ass: I like big butts...')
 endfunction
 
+function! s:suite.foldtext_classes_without_comments() abort
+  call append(0, [
+    \ 'class Ass(object):',
+    \ '',
+    \ '    def __init__(self, left, right):',
+    \ '        self.left = left',
+    \ '        self.right = right',
+    \ ])
+  norm! zX 
+  call s:assert.equals(s:s.get_python_fold_text(1, 6), 'class Ass')
+endfunction
+
 function! s:suite.foldtext_decorated_functions() abort
   call append(0, [
     \ '@classmethod',
@@ -227,4 +261,72 @@ function! s:suite.foldtext_decorated_functions() abort
     \ ])
   norm! zX 
   call s:assert.equals(s:s.get_python_fold_text(1, 3), 'def @its_hammer_time')
+endfunction
+
+function! s:suite.fold_multiple_classes() abort
+  call append(0, [
+    \ 'class Ass(object):',
+    \ '    def __init__(self, left, right):',
+    \ '        self.left = left',
+    \ '        self.right = right',
+    \ '',
+    \ '',
+    \ 'class BigButtsException:',
+    \ '    def dont_lie(self):',
+    \ '        print("i cannot lie")',
+    \ ])
+  norm! zX 
+  call s:assert.equal(s:get_fold_levels(), [1, 2, 2, 2, 2, 2, 1, 2, 2])
+endfunction
+
+function! s:suite.does_not_fold_inline_functions_in_functions() abort
+  call append(0, [
+    \ 'def its_hammer_time():',
+    \ '    print("hammer time!")',
+    \ '    def foobar():',
+    \ '        print("pewpew")',
+    \ '    print("hammer time!")',
+    \ '    print("hammer time!")',
+    \ ])
+  norm! zX 
+  call s:assert.equal(s:get_fold_levels(), [1, 1, 1, 1, 1, 1])
+endfunction
+
+function! s:suite.does_not_fold_inline_functions_in_methods() abort
+  call append(0, [
+    \ '    def its_hammer_time(self):',
+    \ '        print("hammer time!")',
+    \ '        def foobar():',
+    \ '            print("pewpew")',
+    \ '        print("hammer time!")',
+    \ '        print("hammer time!")',
+    \ ])
+  norm! zX 
+  call s:assert.equal(s:get_fold_levels(), [2, 2, 2, 2, 2, 2])
+endfunction
+
+function! s:suite.foldtext_classes_with_decorated_method() abort
+  call append(0, [
+    \ 'class Ass(object):',
+    \ '',
+    \ '    @kungpow',
+    \ '    def chicken(self):',
+    \ '        print("hahahahahah")',
+    \ ])
+  norm! zX 
+  call s:assert.equals(s:s.get_python_fold_text(1, 5), 'class Ass')
+endfunction
+
+function! s:suite.top_level_logic_is_not_folded() abort
+  call append(0, [
+    \ 'def foobar():',
+    \ '    print("gold fush")',
+    \ '',
+    \ '',
+    \ 'if __name__ == "__main__":',
+    \ '    foo = 1',
+    \ '    bar = 2',
+    \ ])
+  norm! zX 
+  call s:assert.equal(s:get_fold_levels(), [1, 1, 1, 1, 0, 0, 0])
 endfunction

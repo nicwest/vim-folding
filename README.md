@@ -1,26 +1,9 @@
-vim-vim folder
-==== 
+vim-folding
+===========
 
 folding for various languages
 
-Usage
------
-
-```viml
-:VIM FOLDER1               " does something
-:VIM FOLDER2               " does something else
-```
-
-Suggested Mappings
-------------------
-
-vim folder doesn't bind anything by default. These are the suggested
-mappings:
-
-```viml
-nnoremap <Leader>p1             <Plug>VIM FOLDER1
-nnoremap <Leader>p2             <Plug>VIM FOLDER2
-```
+![folding](https://upload.wikimedia.org/wikipedia/commons/2/23/Blintz-fold.jpg)
 
 Tests
 -----
