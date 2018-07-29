@@ -1,6 +1,8 @@
 vim-folding
 ===========
 
+[![Build Status](https://travis-ci.org/nicwest/vim-folding.svg?branch=master)](https://travis-ci.org/nicwest/vim-folding)
+
 folding for various languages
 
 ![folding](https://upload.wikimedia.org/wikipedia/commons/2/23/Blintz-fold.jpg)
