@@ -3,6 +3,15 @@ let s:assert = themis#helper('assert')
 let s:scope = themis#helper('scope')
 let s:s = s:scope.funcs('ftplugin/python.vim')
 
+function! s:suite.before() abort
+  new test_python.py
+  source ./ftplugin/python.vim
+endfunction
+
+function! s:suite.after() abort
+  bwipe!
+endfunction
+
 function! s:get_fold_levels() abort
   return map(range(1, line('$')-1), 'foldlevel(v:val)')
 endfunction
