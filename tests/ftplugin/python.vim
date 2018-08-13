@@ -291,7 +291,7 @@ endfunction
 function! s:suite.does_not_fold_inline_functions_in_functions() abort
   call append(0, [
     \ 'def its_hammer_time():',
-    \ '    print("hammer time!")',
+    \ '',
     \ '    def foobar():',
     \ '        print("pewpew")',
     \ '    print("hammer time!")',

@@ -21,7 +21,7 @@ function! s:is_start_of_fold(line) abort
 endfunction
 
 function! s:get_previous_class_def(linenr, spaces) abort
-  if a:linenr == 0
+  if a:linenr < 1
     return 0
   endif
   let l:line = getline(a:linenr)
@@ -29,6 +29,14 @@ function! s:get_previous_class_def(linenr, spaces) abort
     return a:linenr
   endif
   return s:get_previous_class_def(a:linenr - 1, a:spaces)
+endfunction
+
+function! s:previous_fold_was_def(lnum, spaces) abort
+    let l:line = getline(s:get_previous_class_def(a:lnum, a:spaces))
+    if l:line =~? s:def
+      return 1
+    endif
+    return 0
 endfunction
 
 function! GetPythonFold(lnum) abort
@@ -59,13 +67,10 @@ function! GetPythonFold(lnum) abort
       return l:level
     endif
 
-    if l:spaces > 0
-      let l:previous_class_def_line = s:get_previous_class_def(a:lnum, l:spaces)
-      let l:previous_class_def = getline(l:previous_class_def_line)
-      if l:previous_class_def =~? s:def
-        return -1
-      endif
+    if l:spaces > 0 && s:previous_fold_was_def(a:lnum, l:spaces)
+      return -1
     endif
+
     return '>' . l:level
   endif
 
@@ -73,6 +78,9 @@ function! GetPythonFold(lnum) abort
   let l:next_spaces = s:number_of_spaces(l:next)
   
   if l:line =~ s:blank && s:is_start_of_fold(l:next)
+    if l:next_spaces > 0 && s:previous_fold_was_def(a:lnum, l:next_spaces)
+      return -1
+    endif
     return '<' . ((l:next_spaces / &shiftwidth) + 1)
   endif
 
