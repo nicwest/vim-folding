@@ -26,43 +26,44 @@ function! s:suite.before_each() abort
   set noexpandtab
 endfunction
 
-function! s:suite.foldexpr_is_set() abort
-  call s:assert.equals(&foldmethod, 'expr')
-  call s:assert.equals(&foldexpr, 'GetGoFold(v:lnum)')
-endfunction
+"function! s:suite.foldexpr_is_set() abort
+"  call s:assert.equals(&foldmethod, 'expr')
+"  call s:assert.equals(&foldexpr, 'GetGoFold(v:lnum)')
+"endfunction
 
-function! s:suite.top_level_imports_are_never_folded() abort
-  call append(0, [
-  \ 'import (',
-  \ '	"database/sql"',
-  \ '	"time"',
-  \ '',
-  \ '	"github.com/shopspring/decimal"',
-  \ ')'
-  \ ])
-  norm! zX 
-  call s:assert.equal(s:get_fold_levels(), [0, 0, 0, 0, 0, 0])
-endfunction
+"function! s:suite.top_level_imports_are_never_folded() abort
+"  call append(0, [
+"  \ 'import (',
+"  \ '	"database/sql"',
+"  \ '	"time"',
+"  \ '',
+"  \ '	"github.com/shopspring/decimal"',
+"  \ ')'
+"  \ ])
+"  norm! zX 
+"  call s:assert.equal(s:get_fold_levels(), [0, 0, 0, 0, 0, 0])
+"endfunction
 
-function! s:suite.functions_are_folded() abort
-  call append(0, [
-  \ 'func Hello(who string) string {',
-  \ '	return fmt.Sprintf("Hello %s!", who)',
-  \ '}',
-  \ ])
-  norm! zX 
-  call s:assert.equal(s:get_fold_levels(), [1, 1, 1])
-endfunction
+"function! s:suite.functions_are_folded() abort
+"  call append(0, [
+"  \ 'func Hello(who string) string {',
+"  \ '	return fmt.Sprintf("Hello %s!", who)',
+"  \ '}',
+"  \ ])
+"  norm! zX 
+"  call s:assert.equal(s:get_fold_levels(), [1, 1, 1])
+"endfunction
 
 
-function! s:suite.structs_are_folded() abort
-  call append(0, [
-  \ 'type Bonkers struct {',
-  \ '	This string',
-  \ '	is string',
-  \ '	SPARTA int',
-  \ '}',
-  \ ])
-  norm! zX 
-  call s:assert.equal(s:get_fold_levels(), [1, 1, 1, 1, 1])
-endfunction
+"function! s:suite.structs_are_folded() abort
+"  call append(0, [
+"  \ 'type Bonkers struct {',
+"  \ '	This string',
+"  \ '	is string',
+"  \ '	SPARTA int',
+"  \ '}',
+"  \ ])
+"  norm! zX 
+"  call s:assert.equal(s:get_fold_levels(), [1, 1, 1, 1, 1])
+"endfunction
+

@@ -339,3 +339,18 @@ function! s:suite.top_level_logic_is_not_folded() abort
   norm! zX 
   call s:assert.equal(s:get_fold_levels(), [1, 1, 1, 1, 0, 0, 0])
 endfunction
+
+
+function! s:suite.method_below_attribute_with_same_indentation_folds() abort
+  call append(0, [
+    \ '    def lol(self):',
+    \ '        return 123',
+    \ '',
+    \ '    foobar = 123',
+    \ '',
+    \ '    def lol(self):',
+    \ '        return 123',
+    \ ])
+  norm! zX 
+  call s:assert.equal(s:get_fold_levels(), [2, 2, 2, 1, 1, 2, 2])
+endfunction
